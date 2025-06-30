@@ -30,8 +30,9 @@ app.post("/weather", async (req, res) => {
         .toISOString()
         .split("T")[0];
 
-      const startHour = parseInt(startTime.split(":")[0]);
-      const endHour = parseInt(endTime.split(":")[0]);
+        const [startHour] = startTime.split(":").map(Number);
+        const [endHour] = endTime.split(":").map(Number);
+
 
       const filteredForecasts = forecastList.filter((entry) => {
         const entryDate = new Date(entry.dt_txt);

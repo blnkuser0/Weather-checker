@@ -17,12 +17,8 @@
         <% summaries.forEach(item => { %>
           <div class="card mb-3 shadow-sm">
             <div class="card-body">
-              <h5 class="card-title"><%= new Date("1970-01-01T" + startTime + ":00").toLocaleTimeString("en-PH", {
-                hour: "numeric", hour12: true 
-              }) %> to 
-              <%= new Date("1970-01-01T" + endTime + ":00").toLocaleTimeString("en-PH", {
-                hour: "numeric", hour12: true 
-              }) %></h5>
+                <h5 class="card-title"><%= item.time %> — Forecast between <%= startTime %> to <%= endTime %></h5>
+
               <p>
                 <strong><%= item.desc %></strong><br/>
                 🌡️ <%= item.tempC %>°C / <%= item.tempF %>°F<br/>
