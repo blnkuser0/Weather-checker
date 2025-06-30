@@ -17,55 +17,68 @@ app.get("/", (req, res) => {
 })
 
 app.post("/weather", async (req, res) => {
-    const city = req.body.city;
+    const { city, startTime, endTime } = req.body;
     const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`;
 
 
     try {
-        const forecastResponse = await axios.get(forecastUrl);
-        const forecastList = forecastResponse.data.list;
+      const response = await axios.get(forecastUrl);
+      const forecastList = response.data.list;
 
-        // Find the forecast for around 12:00 noon tomorrow
-        const now = new Date();
-        const tomorrowDateStr = new Date(now.setDate(now.getDate() + 1))
-          .toISOString()
-          .split("T")[0];
+      const now = new Date();
+      const tomorrowStr = new Date(now.setDate(now.getDate() + 1))
+        .toISOString()
+        .split("T")[0];
 
-        const tomorrowForecast = forecastList.find(
-          (entry) =>
-            entry.dt_txt.startsWith(tomorrowDateStr) &&
-            entry.dt_txt.includes("12:00:00")
+      const startHour = parseInt(startTime.split(":")[0]);
+      const endHour = parseInt(endTime.split(":")[0]);
+
+      const filteredForecasts = forecastList.filter((entry) => {
+        const entryDate = new Date(entry.dt_txt);
+        const entryHour = entryDate.getHours();
+        return (
+          entry.dt_txt.startsWith(tomorrowStr) &&
+          entryHour >= startHour &&
+          entryHour <= endHour
         );
-    
-        if (!tomorrowForecast) {
-          return res.send("Couldn't find forecast data for tomorrow.");
-        }
+      });
 
-        const weatherDesc = tomorrowForecast.weather[0].description;
-        const rainType = weatherDesc.includes("heavy")
-          ? "Heavy Rain"
-          : weatherDesc.includes("moderate")
-          ? "Mild Rain"
-          : weatherDesc.includes("light")
-          ? "Light Rain"
-          : "No Rain";
-
-        // UV index is not available in /forecast endpoint, so use a placeholder or remove
-        const sunscreenAlert = weatherDesc.includes("clear")
-          ? "Yes, apply sunscreen!"
-          : "No sunscreen needed.";
-    
-        res.render("result", {
-          city,
-          rainType,
-          weatherDesc,
-          uvIndex: "N/A",
-          sunscreenAlert,
+        const summaries = filteredForecasts.map((entry) => {
+        const entryDate = new Date(entry.dt_txt);
+        const time = entryDate.toLocaleTimeString("en-PH", {
+          hour: "numeric",
+          hour12: true,
         });
-      } catch (error) {
-        console.error(error.message);
-        res.send("Error retrieving weather data. Please try again.");
-      }
+
+        const desc = entry.weather[0].description;
+        const tempC = entry.main.temp.toFixed(1);
+        const tempF = ((entry.main.temp * 9) / 5 + 32).toFixed(1);
+
+        let suggestion = "";
+        if (desc.includes("rain")) suggestion = "🌧️ Bring umbrella.";
+        else if (desc.includes("clear") && entry.main.temp > 30)
+          suggestion = "☀️ Wear sunscreen due to high UV rays.";
+        else suggestion = "✅ No umbrella or sunscreen needed.";
+
+        return {
+          time,
+          desc,
+          tempC,
+          tempF,
+          suggestion,
+        };
+      });
+
+      res.render("result", {
+        city,
+        summaries,
+        startTime,
+        endTime,
+      });
+    } catch (err) {
+      console.error(err.message);
+      res.send("Error retrieving weather data.");
+    }
 })
 
 // app.get("/test", async (req, res) => {

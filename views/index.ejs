@@ -10,10 +10,17 @@
 <body class="bg-light text-center p-5">
   <div class="container">
     <h1 class="mb-4">Check Tomorrow's Weather</h1>
-    <form action="/weather" method="POST" class="mb-3">
-      <input type="text" name="city" class="form-control mb-3" placeholder="Enter your city..." required />
-      <button type="submit" class="btn btn-primary">Check Weather</button>
-    </form>
+    <form action="/weather" method="POST">
+        <input type="text" name="city" class="form-control mb-3" placeholder="Enter City" required/>
+      
+        <div class="d-flex flex-column flex-sm-row gap-2">
+            <input type="time" name="startTime" class="form-control w-auto" required />
+            <input type="time" name="endTime" class="form-control w-auto" required />
+          </div>
+      
+        <button type="submit" class="btn btn-primary">Check Weather</button>
+      </form>
+      
   </div>
 </body>
 </html>

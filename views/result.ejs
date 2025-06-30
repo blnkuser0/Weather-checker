@@ -9,10 +9,30 @@
 </head>
 <body class="bg-light text-center p-5">
   <div class="container">
-    <h1 class="mb-4">Weather Forecast for <%= city %></h1>
-    <h3><%= weatherDesc %> - <%= rainType %></h3>
-    <p><strong>UV Index:</strong> <%= uvIndex %></p>
-    <p><strong>Sunscreen Needed?</strong> <%= sunscreenAlert %></p>
+    <h1 class="mb-4">🌤️ Weather Forecast for <%= city %></h1>
+
+    <% if (summaries.length === 0) { %>
+        <p>No forecast found for the selected time range.</p>
+      <% } else { %>
+        <% summaries.forEach(item => { %>
+          <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title"><%= new Date("1970-01-01T" + startTime + ":00").toLocaleTimeString("en-PH", {
+                hour: "numeric", hour12: true 
+              }) %> to 
+              <%= new Date("1970-01-01T" + endTime + ":00").toLocaleTimeString("en-PH", {
+                hour: "numeric", hour12: true 
+              }) %></h5>
+              <p>
+                <strong><%= item.desc %></strong><br/>
+                🌡️ <%= item.tempC %>°C / <%= item.tempF %>°F<br/>
+                <span class="text-info fw-bold"><%= item.suggestion %></span>
+              </p>
+            </div>
+          </div>
+        <% }); %>
+      <% } %>
+
     <a href="/" class="btn btn-secondary mt-4">Check Another City</a>
   </div>
 </body>
